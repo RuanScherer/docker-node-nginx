@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  database:
+    image: mysql:5.7
+    container_name: database
+    command: --innodb-use-native-aio=0
+    restart: always
+    tty: true
+    volumes:
+      - ./database/:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=dockernodepeople
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - node-net
+
+  web:
+    image: ruanscherer/docker-node-nginx
+    build:
+      context: node
+    container_name: web
+    volumes:
+      - ./node/:/src/app
+    networks:
+      - node-net
+    depends_on:
+      - database
+
+  reverse-proxy:
+    image: ruanscherer/nginx
+    container_name: reverse-proxy
+    build:
+      context: nginx
+    ports:
+      - "8080:80"
+    networks:
+      - node-net
+    depends_on:
+      - web
+
+networks:
+  node-net:
+    driver: bridge

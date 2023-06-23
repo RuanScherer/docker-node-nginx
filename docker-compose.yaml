@@ -13,7 +13,9 @@ services:
       - MYSQL_DATABASE=dockernodepeople
       - MYSQL_ROOT_PASSWORD=root
     networks:
-      - node-net
+      node-net:
+        aliases:
+          - database
 
   web:
     image: ruanscherer/docker-node-nginx
@@ -23,7 +25,9 @@ services:
     volumes:
       - ./node/:/src/app
     networks:
-      - node-net
+      node-net:
+        aliases:
+          - web
     depends_on:
       - database
 
